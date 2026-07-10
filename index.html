@@ -66,6 +66,125 @@
             display: none;
         }
         #install-prompt.visible { display: flex; }
+
+        /* Viewport simulation */
+        #viewport-frame-wrap {
+            transition: max-width 0.4s cubic-bezier(0.16,1,0.3,1), max-height 0.4s cubic-bezier(0.16,1,0.3,1);
+            margin: 0 auto;
+            max-width: 100%;
+        }
+        .viewport-mobile #viewport-frame-wrap { max-width: 390px; }
+        .viewport-tablet #viewport-frame-wrap { max-width: 834px; }
+        .viewport-desktop #viewport-frame-wrap { max-width: 100%; }
+
+        .device-icon-btn {
+            transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+        }
+        .device-icon-btn.active {
+            background: rgba(16,185,129,0.15);
+            border-color: rgba(16,185,129,0.4);
+            color: #10b981;
+        }
+
+        /* Day-type pathway tabs */
+        .day-type-tab {
+            transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+        }
+        .day-type-tab.active-work {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-color: #2563eb;
+        }
+        .day-type-tab.active-leave {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-color: #d97706;
+        }
+
+        /* Daily add-on counter */
+        .daily-addon-block {
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+        }
+        .daily-addon-task {
+            transition: all 0.2s ease;
+        }
+        .daily-addon-task.strike {
+            text-decoration: line-through;
+            opacity: 0.4;
+        }
+        .daily-addon-task.removing {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        @keyframes slide-in-task { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+        .daily-addon-task { animation: slide-in-task 0.25s ease both; }
+
+        /* Mobile UI redesign */
+        .mobile-ui { display: none; }
+        .desktop-ui { display: block; }
+        body.viewport-mobile .mobile-ui { display: block; }
+        body.viewport-mobile .desktop-ui { display: none; }
+
+        .mobile-card {
+            background: linear-gradient(135deg, rgba(24,24,27,0.95), rgba(9,9,11,0.98));
+            border: 1px solid rgba(63,63,70,0.5);
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 4px 24px -8px rgba(0,0,0,0.6);
+        }
+        .mobile-habit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(24,24,27,0.6);
+            border: 1px solid rgba(63,63,70,0.3);
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+        .mobile-habit-row:active { transform: scale(0.98); }
+        .mobile-check-btn {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            border: 2px solid #3f3f46;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .mobile-check-btn.checked {
+            background: #10b981;
+            border-color: #059669;
+            color: black;
+            font-weight: bold;
+        }
+
+        /* Auto-remove animation */
+        @keyframes habit-complete-out {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); background: rgba(16,185,129,0.1); }
+            100% { opacity: 0; transform: scale(0.95); height: 0; padding: 0; margin: 0; overflow: hidden; }
+        }
+        .habit-auto-removing {
+            animation: habit-complete-out 0.6s ease forwards;
+            pointer-events: none;
+        }
+
+        /* Comparative chart container */
+        #comparative-chart-container {
+            min-height: 160px;
+            position: relative;
+        }
+
+        /* Threshold validation error */
+        .threshold-error {
+            color: #f87171;
+            font-size: 10px;
+            font-family: monospace;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body class="transition-colors duration-300 font-sans bg-zinc-950 text-zinc-100 selection:bg-emerald-500 selection:text-black">
@@ -251,6 +370,33 @@
                     <label class="block text-xs uppercase font-mono tracking-wider text-zinc-500 font-bold">Identity</label>
                     <input type="text" id="username-input" value="" placeholder="e.g. Operator, Builder, Athlete" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-white font-medium placeholder:text-zinc-600">
                 </div>
+                <div class="space-y-2 pt-4 border-t border-zinc-800">
+                    <label class="block text-xs uppercase font-mono tracking-wider text-zinc-500 font-bold">Alternate Pathway System</label>
+                    <p class="text-[11px] text-zinc-500 leading-relaxed">Choose how you want to split your days between Work and Leave/Weekend modes.</p>
+                    <div class="grid grid-cols-1 gap-2 pt-1" id="pathway-mode-selector">
+                        <label class="flex items-center gap-3 p-3 bg-zinc-950 rounded-lg border border-zinc-800 cursor-pointer hover:border-emerald-500/30 transition-all pathway-option" data-mode="not-needed">
+                            <input type="radio" name="pathway-mode" value="not-needed" class="accent-emerald-500" checked>
+                            <div>
+                                <div class="text-sm font-bold text-zinc-200">Not Needed</div>
+                                <div class="text-[10px] text-zinc-500">Standard tracker — no day splitting.</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 bg-zinc-950 rounded-lg border border-zinc-800 cursor-pointer hover:border-emerald-500/30 transition-all pathway-option" data-mode="realtime">
+                            <input type="radio" name="pathway-mode" value="realtime" class="accent-emerald-500">
+                            <div>
+                                <div class="text-sm font-bold text-zinc-200">Real-Time Integrated</div>
+                                <div class="text-[10px] text-zinc-500">Auto-switches Work/Leave tabs based on calendar (Mon–Fri vs weekends).</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 bg-zinc-950 rounded-lg border border-zinc-800 cursor-pointer hover:border-emerald-500/30 transition-all pathway-option" data-mode="manual">
+                            <input type="radio" name="pathway-mode" value="manual" class="accent-emerald-500">
+                            <div>
+                                <div class="text-sm font-bold text-zinc-200">Manual Toggle</div>
+                                <div class="text-[10px] text-zinc-500">Manually switch between Work and Leave day tabs. Both tracked equally.</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
                 <p class="text-[11px] text-zinc-500 leading-relaxed pt-2">
                     Next: add your first <strong class="text-emerald-400">Identity Pillar</strong> — the smallest daily action that proves who you intend to be.
                 </p>
@@ -266,6 +412,21 @@
     <div class="min-h-screen flex flex-col">
         
         <header class="border-b border-zinc-900 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-40" id="global-header">
+            <div id="viewport-device-bar" class="border-b border-zinc-900/60 bg-zinc-950/80 px-4 py-1.5 flex items-center justify-center gap-2">
+                <span class="text-[9px] font-mono uppercase tracking-widest text-zinc-600 mr-2 hidden sm:inline">Viewport:</span>
+                <button onclick="setViewportMode('desktop')" id="vp-btn-desktop" class="device-icon-btn active flex items-center gap-1.5 px-3 py-1 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 text-[10px] font-mono font-bold uppercase cursor-pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    Desktop
+                </button>
+                <button onclick="setViewportMode('tablet')" id="vp-btn-tablet" class="device-icon-btn flex items-center gap-1.5 px-3 py-1 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 text-[10px] font-mono font-bold uppercase cursor-pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    Tablet
+                </button>
+                <button onclick="setViewportMode('mobile')" id="vp-btn-mobile" class="device-icon-btn flex items-center gap-1.5 px-3 py-1 rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-400 text-[10px] font-mono font-bold uppercase cursor-pointer">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    Mobile
+                </button>
+            </div>
             <div class="max-w-[1700px] mx-auto px-4 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
                 
                 <div class="flex items-center gap-3.5 justify-center sm:justify-start apex-fade-up">
@@ -311,7 +472,8 @@
             </div>
         </header>
 
-        <main class="flex-1 max-w-[1700px] w-full mx-auto p-4 lg:p-6 space-y-6">
+        <main class="flex-1 w-full mx-auto p-4 lg:p-6 space-y-6" id="viewport-frame-wrap">
+            <div class="desktop-ui">
             
             <div id="motivation-banner" class="p-4 rounded-xl border premium-transition text-sm flex items-center justify-between gap-4 shadow-xl">
                 <div class="flex items-center gap-3">
@@ -366,6 +528,44 @@
                     </div>
                 </div>
 
+                <div id="pathway-tabs-container" class="hidden flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-xl border border-zinc-900 bg-zinc-900/20">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-bold">Day Type:</span>
+                        <button onclick="switchDayType('work')" id="day-type-tab-work" class="day-type-tab px-4 py-1.5 rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-300 text-xs font-bold font-mono uppercase cursor-pointer">
+                            Work Days
+                        </button>
+                        <button onclick="switchDayType('leave')" id="day-type-tab-leave" class="day-type-tab px-4 py-1.5 rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-300 text-xs font-bold font-mono uppercase cursor-pointer">
+                            Leave Days
+                        </button>
+                        <span id="day-type-auto-indicator" class="hidden text-[9px] font-mono text-emerald-400 ml-2">(auto-detected)</span>
+                    </div>
+                    <span class="text-[9px] font-mono text-zinc-600" id="pathway-mode-label"></span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 dashboard-card" id="daily-addon-block">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-xs tracking-tight uppercase font-mono text-zinc-400">Daily Add-On Counter</h3>
+                            <span class="text-[9px] font-mono text-zinc-500" id="addon-task-count">0 tasks</span>
+                        </div>
+                        <p class="text-[10px] text-zinc-500 mb-3">Quick to-do. Resets at midnight. Click to complete & remove.</p>
+                        <div id="daily-addon-list" class="space-y-1.5 min-h-[40px]"></div>
+                        <div class="flex gap-1.5 mt-3">
+                            <input id="addon-input" type="text" placeholder="Add a quick task..." maxlength="80" class="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50">
+                            <button onclick="addAddonTask()" class="px-3 py-2 rounded-lg bg-emerald-500 text-black text-sm font-bold hover:bg-emerald-400 transition-colors">+</button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 dashboard-card" id="comparative-chart-block">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-xs tracking-tight uppercase font-mono text-zinc-400">Work vs Leave Performance</h3>
+                            <span class="text-[9px] font-mono text-zinc-500">Comparative Vector</span>
+                        </div>
+                        <div id="comparative-chart-container" class="w-full">
+                            <canvas id="comparativeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="rounded-xl border border-zinc-900 bg-zinc-900/10 overflow-hidden dashboard-card shadow-2xl">
                     
                     <div class="p-4 border-b border-zinc-900 bg-zinc-900/30 flex flex-col sm:flex-row justify-between items-center gap-3" id="matrix-toolbar">
@@ -415,6 +615,31 @@
                         </div>
                 </div>
             </div>
+            <div class="mobile-ui" id="mobile-app-container">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-zinc-100" id="mobile-date-label">Today</h2>
+                        <p class="text-[10px] font-mono uppercase tracking-widest text-zinc-500" id="mobile-day-label"></p>
+                    </div>
+                    <div class="flex gap-1.5" id="mobile-day-type-tabs"></div>
+                </div>
+                <div class="mobile-card mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-bold text-zinc-200">Daily Add-On</h3>
+                        <span class="text-[9px] font-mono text-zinc-500" id="mobile-addon-count">0 tasks</span>
+                    </div>
+                    <div id="mobile-daily-addon-list" class="space-y-1.5"></div>
+                    <div class="flex gap-1.5 mt-2">
+                        <input id="mobile-addon-input" type="text" placeholder="Quick task..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50">
+                        <button onclick="addMobileAddonTask()" class="px-3 py-2 rounded-lg bg-emerald-500 text-black text-sm font-bold">+</button>
+                    </div>
+                </div>
+                <div id="mobile-habits-list" class="space-y-2"></div>
+                <div class="mobile-card mt-4">
+                    <h3 class="text-sm font-bold text-zinc-200 mb-2">Performance</h3>
+                    <div id="mobile-comparative-chart" class="w-full"></div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -431,8 +656,14 @@
                 </div>
                 <div>
                     <label class="block text-zinc-400 font-mono font-bold uppercase tracking-wide mb-1">Global Target Horizon Threshold (Days)</label>
-                    <input type="number" id="habit-goal-field" min="1" value="20" class="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                    <input type="number" id="habit-goal-field" min="1" value="20" oninput="validateTargetThreshold()" class="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-emerald-500">
                     <p class="text-[10px] text-zinc-500 mt-1">Set any length target (e.g. 66, 90, 100 days).</p>
+                </div>
+                <div>
+                    <label class="block text-zinc-400 font-mono font-bold uppercase tracking-wide mb-1">Individual Target Threshold (Days)</label>
+                    <input type="number" id="habit-target-threshold-field" min="1" value="20" oninput="validateTargetThreshold()" class="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                    <p class="text-[10px] text-zinc-500 mt-1">Tick boxes rendered = this value. Cannot exceed the master threshold above.</p>
+                    <div id="threshold-error-msg" class="threshold-error hidden"></div>
                 </div>
                 <div id="habit-start-date-container">
                     <label class="block text-zinc-400 font-mono font-bold uppercase tracking-wide mb-1">System Tracking Initialization Date</label>
@@ -1094,7 +1325,7 @@
                 const computedEndDateString = calculateHabitGoalEndDate(habit.startDate, habit.goal);
 
                 let habitRowMarkup = `
-                    <div class="matrix-grid-layout text-center text-xs font-medium items-center hover:bg-zinc-500/5 group">
+                    <div class="matrix-grid-layout text-center text-xs font-medium items-center hover:bg-zinc-500/5 group" data-habit-id="${habit.id}">
                         <div class="py-2 px-3 text-left border-r ${globalBorders} font-semibold truncate tracking-tight flex flex-col justify-center min-h-[52px]">
                             <span class="truncate pr-1 block cursor-pointer hover:text-emerald-500 transition-colors text-white font-bold" onclick="openHabitModal('${habit.id}')">${habit.name}</span>
                             <span class="text-[9px] text-zinc-500 font-mono block mt-0.5 uppercase tracking-tight">Ends: ${computedEndDateString}</span>
@@ -1102,7 +1333,8 @@
                         <div class="py-3 font-mono font-bold border-r ${globalBorders} opacity-40 text-center">${habit.goal}</div>
                 `;
 
-                for (let dayIndex = 1; dayIndex <= daysInMonth; dayIndex++) {
+                const effectiveThreshold = Math.min(habit.targetThreshold || habit.goal, daysInMonth);
+                for (let dayIndex = 1; dayIndex <= effectiveThreshold; dayIndex++) {
                     const trackingKey = generateDateContextKey(dayIndex);
                     const isChecked = !!habit.history[trackingKey];
 
@@ -1169,6 +1401,13 @@
 
             operationalizeGraphicsEngines(daysInMonth, dynamicDailyCompletionsArray, habitLabels, habitCompletions);
             evaluateIdentityMotivations();
+
+            // Feature integrations
+            updatePathwayUI();
+            renderDailyAddon();
+            renderComparativeChart();
+            renderMobileApp();
+            renderMobileAddon();
         }
 
         function toggleExecutionCoordinate(habitId, dayIndex) {
@@ -1178,6 +1417,7 @@
                 targetHabit.history[storageKey] = !targetHabit.history[storageKey];
                 saveSystemState();
                 executeUIRenderLifecycle();
+                checkAutoRemove(targetHabit);
             }
         }
 
@@ -1216,6 +1456,9 @@
         function commitHabitChanges() {
             const name = document.getElementById('habit-name-field').value.trim();
             const goal = parseInt(document.getElementById('habit-goal-field').value) || 20;
+            const targetThresholdField = document.getElementById('habit-target-threshold-field');
+            const targetThreshold = targetThresholdField ? Math.max(1, parseInt(targetThresholdField.value) || goal) : goal;
+            const validatedTarget = Math.min(targetThreshold, goal);
             const startDate = document.getElementById('habit-start-field').value || new Date().toISOString().split('T')[0];
             const editId = document.getElementById('edit-habit-id').value;
 
@@ -1226,6 +1469,7 @@
                 if (index !== -1) {
                     appState.habits[index].name = name;
                     appState.habits[index].goal = Math.max(1, goal);
+                    appState.habits[index].targetThreshold = validatedTarget;
                     appState.habits[index].startDate = startDate;
                 }
             } else {
@@ -1234,6 +1478,7 @@
                     id: uniqueId,
                     name: name,
                     goal: Math.max(1, goal),
+                    targetThreshold: validatedTarget,
                     startDate: startDate,
                     history: {}
                 });
@@ -1261,12 +1506,397 @@
             }
         }
 
-        // ENTRY POINT SYSTEM BOOT RUNTIME
+        // ============ FEATURE 1: ALTERNATE PATHWAY SYSTEM ============
+        let currentDayType = 'work';
+        let manualDayType = 'work';
+        let comparativeChartInstance = null;
+
+        function getPathwayMode() {
+            return appState.pathwayMode || 'not-needed';
+        }
+        function setPathwayMode(mode) {
+            appState.pathwayMode = mode;
+            saveSystemState();
+            updatePathwayUI();
+            executeUIRenderLifecycle();
+        }
+        function isWorkDay(date = new Date()) {
+            const day = date.getDay();
+            return day >= 1 && day <= 5;
+        }
+        function autoDetectDayType() {
+            return isWorkDay(new Date()) ? 'work' : 'leave';
+        }
+        function getActiveDayType() {
+            const mode = getPathwayMode();
+            if (mode === 'not-needed') return 'work';
+            if (mode === 'realtime') return autoDetectDayType();
+            if (mode === 'manual') return manualDayType;
+            return 'work';
+        }
+        function switchDayType(type) {
+            manualDayType = type;
+            currentDayType = type;
+            updateDayTypeTabs();
+            executeUIRenderLifecycle();
+        }
+        function updateDayTypeTabs() {
+            const mode = getPathwayMode();
+            const container = document.getElementById('pathway-tabs-container');
+            if (!container) return;
+            if (mode === 'not-needed') {
+                container.classList.add('hidden');
+                container.classList.remove('flex');
+                return;
+            }
+            container.classList.remove('hidden');
+            container.classList.add('flex');
+            const active = getActiveDayType();
+            const workTab = document.getElementById('day-type-tab-work');
+            const leaveTab = document.getElementById('day-type-tab-leave');
+            const autoIndicator = document.getElementById('day-type-auto-indicator');
+            const modeLabel = document.getElementById('pathway-mode-label');
+            if (workTab && leaveTab) {
+                workTab.classList.remove('active-work', 'active-leave');
+                leaveTab.classList.remove('active-work', 'active-leave');
+                if (active === 'work') workTab.classList.add('active-work');
+                else leaveTab.classList.add('active-leave');
+                if (mode === 'realtime') {
+                    workTab.disabled = true; leaveTab.disabled = true;
+                    workTab.style.opacity = '0.7'; leaveTab.style.opacity = '0.7';
+                    if (autoIndicator) autoIndicator.classList.remove('hidden');
+                } else {
+                    workTab.disabled = false; leaveTab.disabled = false;
+                    workTab.style.opacity = '1'; leaveTab.style.opacity = '1';
+                    if (autoIndicator) autoIndicator.classList.add('hidden');
+                }
+            }
+            if (modeLabel) {
+                modeLabel.innerText = mode === 'realtime' ? 'Real-Time Integrated' : 'Manual Toggle';
+            }
+        }
+        function updatePathwayUI() {
+            updateDayTypeTabs();
+            renderMobileDayTypeTabs();
+        }
+
+        // ============ FEATURE 2: DAILY ADD-ON COUNTER ============
+        function getDailyAddonTasks() {
+            const today = new Date().toISOString().split('T')[0];
+            const key = 'apex_daily_addon_' + today;
+            try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+        }
+        function saveDailyAddonTasks(tasks) {
+            const today = new Date().toISOString().split('T')[0];
+            const key = 'apex_daily_addon_' + today;
+            localStorage.setItem(key, JSON.stringify(tasks));
+        }
+        function addAddonTask() {
+            const input = document.getElementById('addon-input');
+            const text = input.value.trim();
+            if (!text) return;
+            const tasks = getDailyAddonTasks();
+            tasks.push({ id: 'addon_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), text, done: false });
+            saveDailyAddonTasks(tasks);
+            input.value = '';
+            renderDailyAddon();
+            renderMobileAddon();
+        }
+        function toggleAddonTask(taskId) {
+            let tasks = getDailyAddonTasks();
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.done = true;
+                saveDailyAddonTasks(tasks);
+                const el = document.querySelector(`[data-addon-id="${taskId}"]`);
+                if (el) {
+                    el.classList.add('strike', 'removing');
+                    setTimeout(() => {
+                        tasks = tasks.filter(t => t.id !== taskId);
+                        saveDailyAddonTasks(tasks);
+                        renderDailyAddon();
+                        renderMobileAddon();
+                    }, 300);
+                } else {
+                    tasks = tasks.filter(t => t.id !== taskId);
+                    saveDailyAddonTasks(tasks);
+                    renderDailyAddon();
+                    renderMobileAddon();
+                }
+            }
+        }
+        function editAddonTask(taskId) {
+            const tasks = getDailyAddonTasks();
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            const newText = prompt('Edit task:', task.text);
+            if (newText && newText.trim()) {
+                task.text = newText.trim();
+                saveDailyAddonTasks(tasks);
+                renderDailyAddon();
+                renderMobileAddon();
+            }
+        }
+        function renderDailyAddon() {
+            const list = document.getElementById('daily-addon-list');
+            const countEl = document.getElementById('addon-task-count');
+            if (!list) return;
+            const tasks = getDailyAddonTasks();
+            if (countEl) countEl.innerText = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
+            if (tasks.length === 0) {
+                list.innerHTML = '<p class="text-[11px] text-zinc-600 italic py-2">No quick tasks. Add one below.</p>';
+                return;
+            }
+            list.innerHTML = tasks.map(t => `
+                <div data-addon-id="${t.id}" class="daily-addon-task flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-950/60 border border-zinc-800 group cursor-pointer hover:border-emerald-500/30" onclick="toggleAddonTask('${t.id}')" oncontextmenu="event.preventDefault();editAddonTask('${t.id}')" title="Click to complete, right-click to edit">
+                    <div class="w-4 h-4 rounded border border-zinc-600 flex items-center justify-center text-[10px] text-emerald-400 flex-shrink-0"></div>
+                    <span class="flex-1 text-sm text-zinc-300 truncate">${escapeHtml(t.text)}</span>
+                    <span class="text-[9px] text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity">✕</span>
+                </div>
+            `).join('');
+        }
+        function escapeHtml(s) {
+            const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+        }
+
+        // ============ FEATURE 3: VIEWPORT SIMULATION ============
+        let currentViewportMode = 'desktop';
+        function setViewportMode(mode) {
+            currentViewportMode = mode;
+            document.body.classList.remove('viewport-mobile', 'viewport-tablet', 'viewport-desktop');
+            document.body.classList.add('viewport-' + mode);
+            document.querySelectorAll('.device-icon-btn').forEach(btn => btn.classList.remove('active'));
+            const btn = document.getElementById('vp-btn-' + mode);
+            if (btn) btn.classList.add('active');
+            localStorage.setItem('apex_viewport_mode', mode);
+            executeUIRenderLifecycle();
+        }
+        function initViewportMode() {
+            const saved = localStorage.getItem('apex_viewport_mode') || 'desktop';
+            const isMobile = window.innerWidth < 768;
+            setViewportMode(isMobile ? 'mobile' : saved);
+        }
+
+        // ============ FEATURE 4: AUTO-REMOVE TASK ============
+        function isHabitComplete(habit) {
+            const totalChecked = Object.values(habit.history || {}).filter(v => v === true).length;
+            return totalChecked >= (habit.targetThreshold || habit.goal);
+        }
+        function checkAutoRemove(habit) {
+            if (isHabitComplete(habit)) {
+                const row = document.querySelector(`[data-habit-id="${habit.id}"]`);
+                if (row && !row.classList.contains('habit-auto-removing')) {
+                    row.classList.add('habit-auto-removing');
+                    setTimeout(() => {
+                        if (appState.habits) {
+                            appState.habits = appState.habits.filter(h => h.id !== habit.id);
+                            saveSystemState();
+                            executeUIRenderLifecycle();
+                        }
+                    }, 600);
+                }
+            }
+        }
+
+        // ============ FEATURE 5: CUSTOM BLOCK THRESHOLD ============
+        function validateTargetThreshold() {
+            const goalField = document.getElementById('habit-goal-field');
+            const targetField = document.getElementById('habit-target-threshold-field');
+            const errEl = document.getElementById('threshold-error-msg');
+            if (!goalField || !targetField) return true;
+            const goal = parseInt(goalField.value) || 0;
+            const target = parseInt(targetField.value) || 0;
+            if (target > goal) {
+                targetField.value = goal;
+                if (errEl) {
+                    errEl.innerText = `Target threshold cannot exceed master threshold (${goal}). Adjusted to ${goal}.`;
+                    errEl.classList.remove('hidden');
+                    setTimeout(() => errEl.classList.add('hidden'), 3000);
+                }
+                return false;
+            }
+            if (errEl) errEl.classList.add('hidden');
+            return true;
+        }
+
+        // ============ COMPARATIVE PERFORMANCE CHART ============
+        function renderComparativeChart() {
+            const canvas = document.getElementById('comparativeChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const container = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const w = container.clientWidth || 400;
+            const h = 160;
+            canvas.width = w * dpr; canvas.height = h * dpr;
+            canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, w, h);
+
+            const habits = appState.habits || [];
+            const today = new Date();
+            const days = 14;
+            const workData = [];
+            const leaveData = [];
+            for (let i = days - 1; i >= 0; i--) {
+                const d = new Date(today); d.setDate(d.getDate() - i);
+                const key = d.toISOString().split('T')[0];
+                const isWork = isWorkDay(d);
+                let workCount = 0, leaveCount = 0;
+                habits.forEach(habit => {
+                    const checked = (habit.history || {})[key] === true;
+                    if (checked) { if (isWork) workCount++; else leaveCount++; }
+                });
+                workData.push(isWork ? workCount : 0);
+                leaveData.push(!isWork ? leaveCount : 0);
+            }
+            const maxVal = Math.max(1, Math.max(...workData, ...leaveData));
+            const padding = { l: 30, r: 10, t: 15, b: 25 };
+            const chartW = w - padding.l - padding.r;
+            const chartH = h - padding.t - padding.b;
+
+            // Grid
+            ctx.strokeStyle = 'rgba(63,63,70,0.2)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding.t + (chartH / 4) * i;
+                ctx.beginPath(); ctx.moveTo(padding.l, y); ctx.lineTo(w - padding.r, y); ctx.stroke();
+                ctx.fillStyle = 'rgba(113,113,122,0.5)';
+                ctx.font = '9px monospace';
+                ctx.fillText(Math.round(maxVal - (maxVal / 4) * i), 5, y + 3);
+            }
+            // X labels
+            ctx.fillStyle = 'rgba(113,113,122,0.4)';
+            ctx.font = '8px monospace';
+            for (let i = 0; i < days; i += 3) {
+                const x = padding.l + (chartW / (days - 1)) * i;
+                const d = new Date(today); d.setDate(d.getDate() - (days - 1 - i));
+                ctx.fillText((d.getMonth()+1) + '/' + d.getDate(), x - 8, h - 8);
+            }
+            // Work line (blue)
+            drawLine(ctx, workData, padding, chartW, chartH, days, maxVal, '#3b82f6');
+            // Leave line (amber)
+            drawLine(ctx, leaveData, padding, chartW, chartH, days, maxVal, '#f59e0b');
+
+            // Legend
+            ctx.font = '9px monospace';
+            ctx.fillStyle = '#3b82f6'; ctx.fillText('● Work', w - 80, 12);
+            ctx.fillStyle = '#f59e0b'; ctx.fillText('● Leave', w - 40, 12);
+        }
+        function drawLine(ctx, data, pad, cw, ch, days, max, color) {
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+            data.forEach((v, i) => {
+                const x = pad.l + (cw / (days - 1)) * i;
+                const y = pad.t + ch - (v / max) * ch;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            // Fill
+            ctx.lineTo(pad.l + cw, pad.t + ch); ctx.lineTo(pad.l, pad.t + ch);
+            ctx.closePath();
+            ctx.fillStyle = color + '15'; ctx.fill();
+            // Dots
+            data.forEach((v, i) => {
+                if (v === 0) return;
+                const x = pad.l + (cw / (days - 1)) * i;
+                const y = pad.t + ch - (v / max) * ch;
+                ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = color; ctx.fill();
+            });
+        }
+
+        // ============ MOBILE UI ============
+        function renderMobileApp() {
+            const habits = appState.habits || [];
+            const listEl = document.getElementById('mobile-habits-list');
+            if (!listEl) return;
+            const todayKey = new Date().toISOString().split('T')[0];
+            if (habits.length === 0) {
+                listEl.innerHTML = '<p class="text-xs text-zinc-500 text-center py-4">No habits yet. Add from desktop view.</p>';
+                return;
+            }
+            listEl.innerHTML = habits.map(habit => {
+                const checked = !!(habit.history || {})[todayKey];
+                const total = Object.values(habit.history || {}).filter(v => v === true).length;
+                const target = habit.targetThreshold || habit.goal;
+                return `
+                    <div class="mobile-habit-row" data-habit-id="${habit.id}">
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-bold text-zinc-100 truncate">${escapeHtml(habit.name)}</div>
+                            <div class="text-[10px] font-mono text-zinc-500 mt-0.5">${total}/${target} days · ${habit.color || '#10b981'}</div>
+                        </div>
+                        <div class="mobile-check-btn ${checked ? 'checked' : ''}" onclick="toggleExecutionCoordinate('${habit.id}', 0)" style="${checked ? 'background:' + (habit.color || '#10b981') + ';border-color:' + (habit.color || '#10b981') : ''}">
+                            ${checked ? '✓' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            const dateLabel = document.getElementById('mobile-date-label');
+            const dayLabel = document.getElementById('mobile-day-label');
+            if (dateLabel) dateLabel.innerText = new Date().toLocaleDateString('en', { month: 'short', day: 'numeric' });
+            if (dayLabel) dayLabel.innerText = new Date().toLocaleDateString('en', { weekday: 'long' }) + (getActiveDayType() === 'work' ? ' · Work' : ' · Leave');
+        }
+        function renderMobileDayTypeTabs() {
+            const container = document.getElementById('mobile-day-type-tabs');
+            if (!container) return;
+            const mode = getPathwayMode();
+            if (mode === 'not-needed') { container.innerHTML = ''; return; }
+            const active = getActiveDayType();
+            container.innerHTML = `
+                <button onclick="switchDayType('work')" class="px-2 py-1 rounded-lg text-[9px] font-mono font-bold uppercase ${active === 'work' ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400'}">Work</button>
+                <button onclick="switchDayType('leave')" class="px-2 py-1 rounded-lg text-[9px] font-mono font-bold uppercase ${active === 'leave' ? 'bg-amber-500 text-white' : 'bg-zinc-800 text-zinc-400'}">Leave</button>
+            `;
+        }
+        function renderMobileAddon() {
+            const listEl = document.getElementById('mobile-daily-addon-list');
+            const countEl = document.getElementById('mobile-addon-count');
+            if (!listEl) return;
+            const tasks = getDailyAddonTasks();
+            if (countEl) countEl.innerText = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
+            if (tasks.length === 0) {
+                listEl.innerHTML = '<p class="text-[10px] text-zinc-600 italic py-1">No quick tasks.</p>';
+                return;
+            }
+            listEl.innerHTML = tasks.map(t => `
+                <div class="daily-addon-task flex items-center gap-2 px-2 py-1.5 rounded-lg bg-zinc-900/60 border border-zinc-800 cursor-pointer" onclick="toggleAddonTask('${t.id}')">
+                    <div class="w-4 h-4 rounded border border-zinc-600 flex-shrink-0"></div>
+                    <span class="flex-1 text-xs text-zinc-300 truncate">${escapeHtml(t.text)}</span>
+                </div>
+            `).join('');
+        }
+        function addMobileAddonTask() {
+            const input = document.getElementById('mobile-addon-input');
+            const text = input.value.trim();
+            if (!text) return;
+            const tasks = getDailyAddonTasks();
+            tasks.push({ id: 'addon_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), text, done: false });
+            saveDailyAddonTasks(tasks);
+            input.value = '';
+            renderDailyAddon();
+            renderMobileAddon();
+        }
+
+        // ============ MIDNIGHT RESET CHECK ============
+        function checkDailyReset() {
+            const today = new Date().toISOString().split('T')[0];
+            const lastReset = localStorage.getItem('apex_last_addon_reset');
+            if (lastReset !== today) {
+                // Old tasks from previous days are already keyed by date, so they're naturally gone
+                localStorage.setItem('apex_last_addon_reset', today);
+                renderDailyAddon();
+                renderMobileAddon();
+            }
+        }
+
+        // ENTRY POINT SYSTEM BOOT RUN TIME
         function bootApexEngineSystem() {
             loadSystemState();
             populateCustomSelectorMenus();
             switchViewTab(appState.activeTab || 'matrix');
             executeUIRenderLifecycle();
+            initViewportMode();
+            checkDailyReset();
+            setInterval(checkDailyReset, 60000);
         }
 
         window.onload = bootApexEngineSystem;
