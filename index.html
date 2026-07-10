@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="description" content="Apex Titan — Identity Execution Intelligence Engine. A premium local-first habit, identity, and systems tracker.">
+    <title>Apex Titan — Identity Execution Intelligence Engine</title>
+
+    <link rel="icon" type="image/png" href="/apex-titan-logo.png">
+    <link rel="apple-touch-icon" href="/apex-titan-logo.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Apex Titan">
+
+    <meta property="og:title" content="Apex Titan — Identity Execution Intelligence Engine">
+    <meta property="og:description" content="A premium local-first habit & identity execution platform.">
+    <meta property="og:image" content="/apex-titan-logo.png">
+    <meta property="og:type" content="website">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Smooth premium scrollbar interactions */
+        ::-webkit-scrollbar { height: 6px; width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
+        .light-mode ::-webkit-scrollbar-thumb { background: #87987d; }
+
+        /* Dynamic CSS Grid configuration matching structural layout proportions */
+        .matrix-grid-layout {
+            display: grid;
+            grid-template-columns: minmax(220px, 1.6fr) minmax(60px, 0.4fr) repeat(var(--days-in-month, 31), minmax(36px, 1fr)) minmax(180px, 1.2fr);
+        }
+
+        /* Fluid scale transitions */
+        .premium-transition {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Premium brand surface — subtle cosmic glow behind logo */
+        .brand-logo-wrap {
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(56,189,248,0.22), rgba(16,185,129,0.08) 45%, transparent 70%);
+        }
+        .brand-logo-wrap::after {
+            content: "";
+            position: absolute; inset: -1px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(125,211,252,0.45), rgba(16,185,129,0.35), rgba(167,139,250,0.4));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            padding: 1px;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        @keyframes apex-fade-up { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
+        .apex-fade-up { animation: apex-fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+        @keyframes apex-pulse-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.45);} 50% { box-shadow: 0 0 0 8px rgba(16,185,129,0);} }
+        .apex-pulse { animation: apex-pulse-glow 2.4s ease-in-out infinite; }
+
+        /* Install prompt */
+        #install-prompt {
+            position: fixed; bottom: 20px; right: 20px; z-index: 60;
+            display: none;
+        }
+        #install-prompt.visible { display: flex; }
+    </style>
+</head>
+<body class="transition-colors duration-300 font-sans bg-zinc-950 text-zinc-100 selection:bg-emerald-500 selection:text-black">
+
+    <!-- Access Gate -->
+    <div id="apex-access-gate" class="fixed inset-0 z-[100] items-center justify-center p-6 hidden overflow-hidden" style="display:none;">
+        <!-- Ambient backdrop -->
+        <div class="absolute inset-0 bg-[#05060a]"></div>
+        <div class="absolute inset-0 opacity-[0.35]" style="background:
+            radial-gradient(900px 600px at 15% 10%, rgba(16,185,129,0.18), transparent 60%),
+            radial-gradient(700px 500px at 85% 90%, rgba(99,102,241,0.18), transparent 60%),
+            radial-gradient(500px 400px at 50% 50%, rgba(244,114,182,0.08), transparent 70%);"></div>
+        <div class="absolute inset-0 opacity-[0.06] mix-blend-overlay" style="background-image:linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);background-size:48px 48px;"></div>
+        <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.85) 100%);"></div>
+
+        <!-- Card -->
+        <div class="relative w-full max-w-[420px]">
+            <!-- glow border -->
+            <div class="absolute -inset-px rounded-[28px] opacity-70 blur-[2px]" style="background:conic-gradient(from 140deg at 50% 50%, rgba(16,185,129,0.6), rgba(99,102,241,0.5), rgba(244,114,182,0.4), rgba(16,185,129,0.6));"></div>
+            <div class="relative rounded-[28px] p-[1px]" style="background:linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));">
+                <div class="rounded-[27px] p-9 space-y-7" style="background:linear-gradient(180deg, rgba(15,17,22,0.92), rgba(8,9,13,0.96)); backdrop-filter: blur(24px); box-shadow: 0 40px 120px -20px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.04);">
+
+                    <!-- Header -->
+                    <div class="flex flex-col items-center space-y-5">
+                        <div class="relative">
+                            <div class="absolute inset-0 rounded-full blur-2xl opacity-60" style="background:radial-gradient(circle, rgba(16,185,129,0.6), transparent 70%);"></div>
+                            <div class="relative w-14 h-14 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 30px -10px rgba(16,185,129,0.6), inset 0 1px 0 rgba(255,255,255,0.25);">
+                                <svg viewBox="0 0 24 24" class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.5 9.2 8 10 4.5-.8 8-5 8-10V6l-8-4z"/></svg>
+                            </div>
+                        </div>
+                        <div class="text-center space-y-2.5">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10" style="background:rgba(255,255,255,0.03);">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="text-[10px] font-medium uppercase tracking-[0.28em] text-zinc-300">Secure Access</span>
+                            </div>
+                            <h2 class="text-[26px] font-semibold tracking-tight" style="background:linear-gradient(180deg,#fff,#a1a1aa); -webkit-background-clip:text; background-clip:text; color:transparent;">Apex Titan</h2>
+                            <p class="text-[13px] leading-relaxed text-zinc-500 max-w-[300px] mx-auto">Identity Execution Intelligence Engine. Authorized operators only.</p>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <form id="apex-access-form" class="space-y-4" autocomplete="off">
+                        <div class="space-y-2">
+                            <label for="apex-access-input" class="block text-[10px] font-medium uppercase tracking-[0.24em] text-zinc-500 pl-1">Activation Credential</label>
+                            <div class="relative group">
+                                <div class="absolute inset-0 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 blur-md" style="background:linear-gradient(90deg, rgba(16,185,129,0.5), rgba(99,102,241,0.4));"></div>
+                                <input id="apex-access-input" type="password" inputmode="text" autocomplete="off" spellcheck="false"
+                                    placeholder="••••••••••"
+                                    class="relative w-full px-5 py-4 bg-black/60 border border-white/10 rounded-xl text-zinc-100 font-mono tracking-[0.35em] text-center text-base focus:outline-none focus:border-emerald-400/60 transition-colors placeholder:text-zinc-700 placeholder:tracking-[0.5em]" />
+                            </div>
+                            <div id="apex-access-error" class="flex items-center justify-center gap-2 text-[11px] text-rose-400/90 pt-1 hidden">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                <span>Access denied. Credential not recognized.</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="group relative w-full py-3.5 rounded-xl font-semibold text-[13px] tracking-[0.18em] uppercase text-black overflow-hidden transition-transform active:scale-[0.98]" style="background:linear-gradient(180deg,#34d399,#10b981); box-shadow: 0 10px 30px -10px rgba(16,185,129,0.6), inset 0 1px 0 rgba(255,255,255,0.4);">
+                            <span class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg,#6ee7b7,#34d399);"></span>
+                            <span class="relative flex items-center justify-center gap-2">
+                                Authenticate
+                                <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                            </span>
+                        </button>
+                    </form>
+
+                    <!-- Footer -->
+                    <div class="flex items-center justify-center gap-3 pt-2 border-t border-white/5">
+                        <div class="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.22em] text-zinc-600 pt-4">
+                            <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                            Encrypted
+                        </div>
+                        <span class="text-zinc-700 pt-4">·</span>
+                        <div class="text-[9px] font-medium uppercase tracking-[0.22em] text-zinc-600 pt-4">Device Bound</div>
+                        <span class="text-zinc-700 pt-4">·</span>
+                        <div class="text-[9px] font-medium uppercase tracking-[0.22em] text-zinc-600 pt-4">One-Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        (function () {
+            const ACCESS_FLAG = 'apex-titan-access-v1';
+            const VALID_KEYS = new Set(["TITAN-1024","TITAN-1185","TITAN-2294","TITAN-2841","TITAN-3105","TITAN-3742","TITAN-4019","TITAN-4286","TITAN-4573","TITAN-5120","TITAN-5684","TITAN-5931","TITAN-6047","TITAN-6382","TITAN-6819","TITAN-7023","TITAN-7294","TITAN-7615","TITAN-7840","TITAN-8156","TITAN-8402","TITAN-8631","TITAN-8924","TITAN-9015","TITAN-9247","TITAN-9463","TITAN-9781","TITAN-1209","TITAN-1436","TITAN-1658","TITAN-1892","TITAN-2045","TITAN-2371","TITAN-2598","TITAN-2736","TITAN-3054","TITAN-3382","TITAN-3591","TITAN-3847","TITAN-4103","TITAN-4369","TITAN-4612","TITAN-4890","TITAN-5037","TITAN-5364","TITAN-5589","TITAN-5812","TITAN-6105","TITAN-6438","TITAN-6671","TITAN-6924","TITAN-7150","TITAN-7389","TITAN-7512","TITAN-7934"]);
+
+            // Block right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            // Block F11, F12, Ctrl+U, Ctrl+Shift+I/J/C, Ctrl+S
+            document.addEventListener('keydown', e => {
+                const k = e.key;
+                if (k === 'F11' || k === 'F12') { e.preventDefault(); return false; }
+                if ((e.ctrlKey || e.metaKey) && ['u','s'].includes(k.toLowerCase())) { e.preventDefault(); return false; }
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k.toLowerCase())) { e.preventDefault(); return false; }
+            });
+
+            const gate = document.getElementById('apex-access-gate');
+            const form = document.getElementById('apex-access-form');
+            const input = document.getElementById('apex-access-input');
+            const err = document.getElementById('apex-access-error');
+
+            const granted = (() => { try { return localStorage.getItem(ACCESS_FLAG) === '1'; } catch (e) { return false; } })();
+
+            if (!granted) {
+                gate.classList.remove('hidden');
+                gate.style.display = 'flex';
+                document.documentElement.style.overflow = 'hidden';
+                setTimeout(() => input && input.focus(), 50);
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const val = (input.value || '').trim().toUpperCase();
+                    if (VALID_KEYS.has(val)) {
+                        try { localStorage.setItem(ACCESS_FLAG, '1'); } catch (_) {}
+                        gate.classList.add('hidden');
+                        gate.style.display = 'none';
+                        document.documentElement.style.overflow = '';
+                        err.classList.add('hidden');
+                    } else {
+                        err.classList.remove('hidden');
+                        input.value = '';
+                        input.focus();
+                    }
+                });
+            }
+
+        })();
+    </script>
+
+
+
+    <div id="onboarding-modal" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-4 backdrop-blur-xl hidden">
+        <div class="max-w-2xl w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-6 lg:p-8 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+                <div class="inline-flex p-2 bg-emerald-500/10 rounded-xl text-emerald-400 font-mono text-xs uppercase tracking-widest border border-emerald-500/20">
+                    Identity Execution Guide
+                </div>
+                <span class="text-zinc-500 text-xs font-mono font-bold" id="tour-step-counter">Step 1 of 3</span>
+            </div>
+
+            <div id="tour-page-1" class="space-y-4">
+                <div class="flex items-center gap-3">
+                    <img src="/apex-titan-logo.png" alt="Apex Titan" class="w-12 h-12 rounded-xl shadow-lg shadow-emerald-500/10 border border-zinc-800">
+                    <h1 class="text-3xl font-black tracking-tight text-white">Welcome to Apex Titan</h1>
+                </div>
+                <p class="text-zinc-400 text-sm leading-relaxed">
+                    Apex Titan is an <strong class="text-emerald-400">identity-first execution engine</strong>. You are not chasing goals — you are engineering a system that consistently produces the person you intend to become. Every checkmark is a vote cast for that identity.
+                </p>
+                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
+                    <p class="text-xs font-bold text-zinc-400 uppercase tracking-wider">The Execution Loop:</p>
+                    <div class="text-xs text-zinc-300 flex gap-2"><span>1.</span> <span><strong>Make It Visible:</strong> Your full system is mapped on one matrix — nothing hides.</span></div>
+                    <div class="text-xs text-zinc-300 flex gap-2"><span>2.</span> <span><strong>Make It Frictionless:</strong> Logging a commitment takes a single click.</span></div>
+                    <div class="text-xs text-zinc-300 flex gap-2"><span>3.</span> <span><strong>Never Drift Twice:</strong> Slip once and the engine surfaces a countermeasure before the pattern hardens.</span></div>
+                </div>
+            </div>
+
+            <div id="tour-page-2" class="space-y-4 hidden">
+                <h2 class="text-2xl font-black text-white">Your Command Surface</h2>
+                <p class="text-zinc-400 text-sm">
+                    The matrix is your operating system for self-mastery. It partitions focus across three signal layers so consistency stays measurable, not aspirational.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div class="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                        <h4 class="font-bold text-emerald-400 mb-1">1. Waveform Vectors</h4>
+                        <p class="text-zinc-500">A continuous line of daily execution volume. Momentum becomes visible before motivation can fade.</p>
+                    </div>
+                    <div class="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                        <h4 class="font-bold text-amber-400 mb-1">2. Temporal Modes</h4>
+                        <p class="text-zinc-500">Switch between live calendar sync and a custom block when you are running focused sprints.</p>
+                    </div>
+                    <div class="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                        <h4 class="font-bold text-blue-400 mb-1">3. Analytics Suite</h4>
+                        <p class="text-zinc-500">Circular efficiency, per-pillar polls, and aggregate hit counts — calculated automatically as you log.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tour-page-3" class="space-y-4 hidden">
+                <h2 class="text-2xl font-black text-white">Claim Your Identity</h2>
+                <p class="text-zinc-400 text-sm">
+                    Name the person you are engineering. All execution data stays on this device — local-first, private by default.
+                </p>
+                <div class="space-y-3 pt-2">
+                    <label class="block text-xs uppercase font-mono tracking-wider text-zinc-500 font-bold">Identity</label>
+                    <input type="text" id="username-input" value="" placeholder="e.g. Operator, Builder, Athlete" class="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-white font-medium placeholder:text-zinc-600">
+                </div>
+                <p class="text-[11px] text-zinc-500 leading-relaxed pt-2">
+                    Next: add your first <strong class="text-emerald-400">Identity Pillar</strong> — the smallest daily action that proves who you intend to be.
+                </p>
+            </div>
+
+            <div class="flex justify-between items-center pt-4 border-t border-zinc-800">
+                <button id="tour-back-btn" onclick="navigateTour(-1)" class="px-4 py-2 text-xs font-mono uppercase bg-zinc-950 hover:bg-zinc-800 rounded-lg text-zinc-400 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer" disabled>Back</button>
+                <button id="tour-next-btn" onclick="navigateTour(1)" class="px-5 py-2.5 text-xs font-mono uppercase bg-emerald-500 text-black font-bold rounded-lg hover:bg-emerald-400 transition-all cursor-pointer">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="min-h-screen flex flex-col">
+        
+        <header class="border-b border-zinc-900 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-40" id="global-header">
+            <div class="max-w-[1700px] mx-auto px-4 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                
+                <div class="flex items-center gap-3.5 justify-center sm:justify-start apex-fade-up">
+                    <div class="brand-logo-wrap relative w-12 h-12 rounded-xl border border-zinc-800 flex items-center justify-center overflow-hidden shadow-lg shadow-black/60 shrink-0">
+                        <img src="/apex-titan-logo.png" alt="Apex Titan logo" class="w-full h-full object-cover rounded-xl" decoding="async" fetchpriority="high">
+                    </div>
+
+                    <div class="text-center sm:text-left">
+                        <div class="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
+                            <h1 class="text-xl font-black tracking-wider uppercase font-mono text-white" style="letter-spacing: 0.15em;">APEX TITAN</h1>
+                            <h2 class="text-base font-bold tracking-tight text-zinc-400 border-l border-zinc-800 pl-2 ml-1" id="app-month-display">January 2026</h2>
+                            <span id="temporal-badge" class="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Real-Time Sync</span>
+                        </div>
+                        <p class="text-[9px] tracking-widest uppercase text-zinc-500 font-mono mt-0.5" id="header-subtitle">— Identity Execution Intelligence Engine —</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center gap-3">
+                    
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-0.5 flex mr-2">
+                        <button onclick="switchViewTab('matrix')" id="tab-matrix-btn" class="px-4 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition bg-emerald-500 text-black shadow-md cursor-pointer">Matrix Tracker</button>
+                        <button onclick="switchViewTab('past')" id="tab-past-btn" class="px-4 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition text-zinc-400 cursor-pointer">Past Metrics</button>
+                    </div>
+
+                    <span id="user-greeting" class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/5 px-3 py-2 rounded-xl border border-emerald-500/10">Architect: -</span>
+                    
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-0.5 flex">
+                        <button onclick="setTemporalMode('realtime')" id="time-rt-btn" class="px-3 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition bg-emerald-500 text-black shadow-md cursor-pointer">Real-Time</button>
+                        <button onclick="setTemporalMode('custom')" id="time-custom-btn" class="px-3 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition text-zinc-400 cursor-pointer">Custom Mode</button>
+                    </div>
+
+                    <div id="custom-time-selectors" class="flex gap-1 items-center hidden">
+                        <select id="select-month" onchange="changeCustomDate()" class="bg-zinc-900 border border-zinc-800 text-xs px-2 py-1.5 rounded-lg text-white font-mono focus:outline-none focus:border-emerald-500"></select>
+                        <select id="select-year" onchange="changeCustomDate()" class="bg-zinc-900 border border-zinc-800 text-xs px-2 py-1.5 rounded-lg text-white font-mono focus:outline-none focus:border-emerald-500"></select>
+                        <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1">
+                            <span class="text-[9px] font-mono text-zinc-500 mr-1 uppercase font-bold">Days:</span>
+                            <input type="number" id="input-custom-days" min="1" max="100" value="30" onchange="changeCustomDaysCount()" class="w-10 bg-transparent text-xs text-white font-mono focus:outline-none text-center">
+                        </div>
+                    </div>
+
+                    <button onclick="toggleTheme()" id="theme-btn" class="px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono uppercase tracking-wider border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition-all cursor-pointer">🌞 Daybreak Mode</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-[1700px] w-full mx-auto p-4 lg:p-6 space-y-6">
+            
+            <div id="motivation-banner" class="p-4 rounded-xl border premium-transition text-sm flex items-center justify-between gap-4 shadow-xl">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl" id="motivation-emoji">🛡️</span>
+                    <div>
+                        <span id="motivation-text" class="font-medium block">Calibrating behavioural core...</span>
+                        <span id="motivation-subtext" class="text-xs text-zinc-500 block mt-0.5">Protect your baseline constraints at all cost vectors.</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="promptArchiveMonth()" id="archive-banner-btn" class="px-3 py-1 text-[10px] font-mono uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 rounded-lg cursor-pointer">Snapshot Month</button>
+                    <button onclick="showOnboardingTour()" class="px-3 py-1 text-[10px] font-mono uppercase border border-zinc-800 hover:bg-zinc-900 rounded-lg text-zinc-400 cursor-pointer">System Docs</button>
+                </div>
+            </div>
+
+            <div id="view-zone-matrix" class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:col-span-2">
+                        <div class="p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 flex flex-col justify-between dashboard-card">
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-zinc-500 font-bold">Aggregated Volumetric Hits</span>
+                            <div class="text-4xl font-black text-emerald-400 mt-2 font-mono tracking-tight" id="stat-completed">0</div>
+                        </div>
+                        <div class="p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 flex flex-col justify-between dashboard-card">
+                            <span class="text-[10px] uppercase font-mono tracking-wider text-zinc-500 font-bold">System Remainder Targets</span>
+                            <div class="text-4xl font-black text-amber-500 mt-2 font-mono tracking-tight" id="stat-left">0</div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 dashboard-card lg:col-span-5 flex flex-col">
+                        <div>
+                            <h3 class="font-bold text-xs tracking-tight uppercase font-mono text-zinc-400 dashboard-title">Waveform Performance Vector</h3>
+                            <p class="text-[10px] text-zinc-500">Continuous daily tracking lines mirroring structural system momentum</p>
+                        </div>
+                        <div class="flex-1 min-h-[140px] mt-2 relative">
+                            <canvas id="waveformChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 dashboard-card lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex flex-col">
+                            <h4 class="font-bold text-[11px] tracking-tight uppercase font-mono text-zinc-400 dashboard-title">Circular Efficiency Curve</h4>
+                            <div class="flex-1 flex items-center justify-center p-2 relative min-h-[120px]">
+                                <canvas id="circularChart"></canvas>
+                        </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="font-bold text-[11px] tracking-tight uppercase font-mono text-zinc-400 dashboard-title">Habit Performance Poll</h4>
+                            <div class="flex-1 flex items-center justify-center p-2 relative min-h-[120px]">
+                                <canvas id="pollChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-zinc-900 bg-zinc-900/10 overflow-hidden dashboard-card shadow-2xl">
+                    
+                    <div class="p-4 border-b border-zinc-900 bg-zinc-900/30 flex flex-col sm:flex-row justify-between items-center gap-3" id="matrix-toolbar">
+                        <span class="text-xs font-bold uppercase tracking-wider font-mono text-zinc-400 dashboard-title" id="matrix-title">Identity Execution Matrix</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="promptArchiveMonth()" class="px-3 py-1.5 text-[10px] font-bold font-mono uppercase bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 rounded-lg premium-transition cursor-pointer">
+                                Save Current Month Context
+                            </button>
+                            <button onclick="openHabitModal()" class="px-3 py-1.5 text-[10px] font-bold font-mono uppercase bg-emerald-500 text-black rounded-lg hover:bg-emerald-400 flex items-center gap-1.5 tracking-wider font-semibold premium-transition cursor-pointer">
+                                <span>+</span> Add Identity Pillar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto selection:bg-transparent">
+                        <div class="min-w-[1400px] divide-y divide-zinc-900/40" id="matrix-table-body">
+                            
+                            <div class="matrix-grid-layout bg-zinc-950/60 text-center font-mono font-bold text-[10px] uppercase tracking-wider text-zinc-400" id="week-header-row"></div>
+
+                            <div class="matrix-grid-layout bg-zinc-950/30 text-center font-mono text-[9px] font-bold text-zinc-500" id="day-names-row"></div>
+
+                            <div class="matrix-grid-layout bg-zinc-950/10 text-center font-mono text-[11px] font-bold text-zinc-400 border-b border-zinc-900/50" id="day-numbers-row"></div>
+
+                            <div id="matrix-rows-injection-target" class="divide-y divide-zinc-900/30"></div>
+
+                            <div class="matrix-grid-layout bg-zinc-950/40 text-center font-mono text-xs text-zinc-300 font-bold" id="daily-completed-totals-row"></div>
+                            <div class="matrix-grid-layout bg-zinc-950/20 text-center font-mono text-xs text-zinc-500 font-bold" id="daily-goals-totals-row"></div>
+                            <div class="matrix-grid-layout bg-zinc-950/40 text-center font-mono text-xs text-amber-500/70 font-bold" id="daily-left-totals-row"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-zone-past" class="space-y-4 hidden">
+                <div class="p-6 rounded-xl border border-zinc-900 bg-zinc-900/20 dashboard-card space-y-4">
+                    <div>
+                        <h3 class="font-bold text-lg tracking-tight uppercase font-mono text-zinc-300 dashboard-title">Archived Historical Performance Tracks</h3>
+                        <p class="text-xs text-zinc-500">Historical performance data captures your structural completion matrices across elapsed operational blocks.</p>
+                    </div>
+                    
+                    <div id="past-archives-empty-state" class="p-8 text-center border border-dashed border-zinc-800 rounded-xl text-zinc-500 font-mono text-sm">
+                        No snapshot tracks currently initialized. Use "Save Current Month Context" to serialize metrics into this historical cache layer.
+                    </div>
+
+                    <div id="past-archives-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="habit-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm hidden">
+        <div class="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <h3 id="habit-modal-title" class="text-lg font-bold font-mono uppercase tracking-tight text-white">Add Identity Pillar</h3>
+            
+            <input type="hidden" id="edit-habit-id">
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-zinc-400 font-mono font-bold uppercase tracking-wide mb-1">Identity Action Name</label>
+                    <input type="text" id="habit-name-field" placeholder="e.g., Deep Work Block" class="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-zinc-400 font-mono font-bold uppercase tracking-wide mb-1">Global Target Horizon Threshold (Days)</label>
+                    <input type="number" id="habit-goal-field" min="1" value="20" class="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                    <p class="text-[10px] text-zinc-500 mt-1">Set any length target (e.g. 66, 90, 100 days).</p>
+                </div>
+                <div id="habit-start-date-container">
+                    <label class="block text-zinc-400 font-mono font-bold uppercase tracking-wide mb-1">System Tracking Initialization Date</label>
+                    <input type="date" id="habit-start-field" class="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                </div>
+            </div>
+
+            <div class="flex justify-between gap-2 pt-2">
+                <button onclick="deleteHabitAction()" id="modal-delete-btn" class="px-3 py-2 text-xs font-mono font-bold uppercase bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 rounded-xl transition-all hidden cursor-pointer">Remove Pillar</button>
+                <div class="flex gap-2 ml-auto">
+                    <button onclick="closeHabitModal()" class="px-4 py-2 text-xs font-mono font-bold uppercase bg-zinc-950 hover:bg-zinc-800 rounded-xl text-zinc-400 cursor-pointer">Cancel</button>
+                    <button onclick="commitHabitChanges()" class="px-4 py-2 text-xs font-mono font-bold uppercase bg-emerald-500 text-black rounded-xl hover:bg-emerald-400 font-bold transition-all cursor-pointer">Save Systems</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="archive-prompt-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm hidden">
+        <div class="max-w-sm w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4 shadow-2xl text-center">
+            <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-xl">💾</div>
+            <h3 class="text-md font-bold font-mono uppercase tracking-tight text-white">Save Operational Blocks</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+                Do you want to archive performance stats for the currently selected window context (<span id="prompt-archive-title" class="text-emerald-400 font-bold"></span>) inside the 'Past' tab layer data architecture?
+            </p>
+            <div class="flex justify-center gap-3 pt-2">
+                <button onclick="closeArchivePrompt()" class="px-4 py-2 text-xs font-mono uppercase bg-zinc-950 hover:bg-zinc-800 rounded-xl text-zinc-400 cursor-pointer">Dismiss</button>
+                <button onclick="commitArchiveSnapshot()" class="px-4 py-2 text-xs font-mono uppercase bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition-all cursor-pointer">Serialize Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. STATE COMPILING MATRIX LAYERS
+        let appState = {
+            username: "",
+            isDarkMode: true,
+            temporalMode: "realtime",
+            customYear: 2026,
+            customMonth: 0,
+            customDaysCount: 30,
+            tourPage: 1,
+            activeTab: "matrix",
+            archives: [],
+            habits: []
+        };
+
+        let chartsInstance = { waveform: null, circular: null, poll: null };
+
+        // No preset identities — every user starts with a clean operating surface.
+
+
+        // 2. TEMPORAL DYNAMICS & RESOLUTION FUNCTIONS
+        function getActiveContextDate() {
+            if (appState.temporalMode === 'realtime') {
+                return new Date(); 
+            }
+            return new Date(appState.customYear, appState.customMonth, 1);
+        }
+
+        function getDaysInCurrentContext() {
+            if (appState.temporalMode === 'custom') {
+                return appState.customDaysCount || 30;
+            }
+            const date = getActiveContextDate();
+            return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+        }
+
+        function generateDateContextKey(dayNumber) {
+            if (appState.temporalMode === 'custom') {
+                return `custom-day-${dayNumber}`;
+            }
+            const d = getActiveContextDate();
+            return `${d.getFullYear()}-${d.getMonth()}-${dayNumber}`;
+        }
+
+        // 3. PERSISTENCE ENGINE
+        function loadSystemState() {
+            // Bumped storage key to v3 — clears any legacy seeded demo data from earlier builds.
+            const cache = localStorage.getItem('apex_titan_v3_state');
+            if (cache) {
+                let parsed = JSON.parse(cache);
+                if(!parsed.archives) parsed.archives = [];
+                if(!parsed.activeTab) parsed.activeTab = "matrix";
+                if(!parsed.customDaysCount) parsed.customDaysCount = 30;
+                if(!Array.isArray(parsed.habits)) parsed.habits = [];
+                parsed.habits.forEach(h => {
+                    if(!h.startDate) h.startDate = new Date().toISOString().split('T')[0];
+                });
+                appState = parsed;
+            } else {
+                // Clean OS for new users — no demo identities, no seeded history.
+                showOnboardingTour();
+            }
+            applyThemeStyles();
+        }
+
+        function saveSystemState() {
+            localStorage.setItem('apex_titan_v3_state', JSON.stringify(appState));
+        }
+
+
+        // 4. ONBOARDING MECHANICS
+        function showOnboardingTour() {
+            appState.tourPage = 1;
+            document.getElementById('username-input').value = appState.username;
+            document.getElementById('onboarding-modal').classList.remove('hidden');
+            renderTourPageStates();
+        }
+
+        function navigateTour(direction) {
+            appState.tourPage += direction;
+            if (appState.tourPage > 3) {
+                completeOnboardingEngine();
+            } else {
+                renderTourPageStates();
+            }
+        }
+
+        function renderTourPageStates() {
+            document.getElementById('tour-step-counter').innerText = `Step ${appState.tourPage} of 3`;
+            document.getElementById('tour-page-1').classList.toggle('hidden', appState.tourPage !== 1);
+            document.getElementById('tour-page-2').classList.toggle('hidden', appState.tourPage !== 2);
+            document.getElementById('tour-page-3').classList.toggle('hidden', appState.tourPage !== 3);
+            
+            document.getElementById('tour-back-btn').disabled = appState.tourPage === 1;
+            document.getElementById('tour-next-btn').innerText = appState.tourPage === 3 ? "Activate System Engine" : "Continue";
+        }
+
+        function completeOnboardingEngine() {
+            const nameInput = document.getElementById('username-input').value.trim();
+            if (nameInput) appState.username = nameInput;
+            document.getElementById('onboarding-modal').classList.add('hidden');
+            saveSystemState();
+            executeUIRenderLifecycle();
+        }
+
+        // 5. MOOD/THEME ENGINE
+        function toggleTheme() {
+            appState.isDarkMode = !appState.isDarkMode;
+            saveSystemState();
+            applyThemeStyles();
+            executeUIRenderLifecycle();
+        }
+
+        function applyThemeStyles() {
+            const bodyNode = document.body;
+            const themeBtn = document.getElementById('theme-btn');
+            const headerNode = document.getElementById('global-header');
+            const dashboardCards = document.querySelectorAll('.dashboard-card');
+            const headersTitles = document.querySelectorAll('.dashboard-title');
+
+            if (appState.isDarkMode) {
+                bodyNode.className = "transition-colors duration-300 font-sans bg-zinc-950 text-zinc-100 selection:bg-emerald-500 selection:text-black";
+                themeBtn.innerHTML = "🌞 Daybreak Mode";
+                themeBtn.className = "px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono uppercase border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition-all cursor-pointer";
+                headerNode.className = "border-b border-zinc-900 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-40";
+                
+                dashboardCards.forEach(card => {
+                    card.classList.remove('bg-white', 'border-stone-300/80', 'shadow-md');
+                    card.classList.add('bg-zinc-900/20', 'border-zinc-900');
+                });
+                headersTitles.forEach(t => t.className = t.className.replace(/text-stone-700/g, 'text-zinc-400'));
+                document.getElementById('header-subtitle').className = "text-[10px] tracking-widest uppercase text-zinc-500 font-mono mt-0.5";
+                document.getElementById('app-month-display').className = "text-base font-bold tracking-tight text-zinc-400 border-l border-zinc-800 pl-2 ml-1";
+            } else {
+                bodyNode.className = "transition-colors duration-300 font-sans bg-[#f7f6f0] text-stone-900 selection:bg-emerald-700 selection:text-white";
+                themeBtn.innerHTML = "🌙 Midnight Mode";
+                themeBtn.className = "px-3 py-1.5 rounded-xl text-[10px] font-bold font-mono uppercase border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 transition-all cursor-pointer";
+                headerNode.className = "border-b border-stone-200 bg-[#f7f6f0]/90 backdrop-blur-md sticky top-0 z-40";
+                
+                dashboardCards.forEach(card => {
+                    card.classList.remove('bg-zinc-900/20', 'border-zinc-900');
+                    card.classList.add('bg-white', 'border-stone-300/80', 'shadow-md');
+                });
+                headersTitles.forEach(t => t.className = t.className.replace(/text-zinc-400/g, 'text-stone-700'));
+                document.getElementById('header-subtitle').className = "text-[10px] tracking-widest uppercase text-stone-400 font-mono mt-0.5";
+                document.getElementById('app-month-display').className = "text-base font-bold tracking-tight text-stone-600 border-l border-stone-300 pl-2 ml-1";
+            }
+            evaluateIdentityMotivations();
+        }
+
+        // 6. ATOMIC HABITS COGNITIVE INTERACTION LOGIC
+        function evaluateIdentityMotivations() {
+            const currentDaysInMonth = getDaysInCurrentContext();
+            let structuralCheckmarkCount = 0;
+            let missedTwiceDetected = false;
+            let totalExecutionCapacity = 0;
+
+            appState.habits.forEach(h => {
+                let consecutiveMissStreak = 0;
+                for (let i = 1; i <= currentDaysInMonth; i++) {
+                    totalExecutionCapacity++;
+                    const checkKey = generateDateContextKey(i);
+                    if (h.history[checkKey]) {
+                        structuralCheckmarkCount++;
+                        consecutiveMissStreak = 0;
+                    } else {
+                        if (appState.temporalMode === 'realtime' && i < new Date().getDate()) {
+                            consecutiveMissStreak++;
+                            if (consecutiveMissStreak >= 2) missedTwiceDetected = true;
+                        }
+                    }
+                }
+            });
+
+            const trackingRatio = totalExecutionCapacity > 0 ? (structuralCheckmarkCount / totalExecutionCapacity) : 0;
+            const banner = document.getElementById('motivation-banner');
+            const emojiEl = document.getElementById('motivation-emoji');
+            const textEl = document.getElementById('motivation-text');
+            const subtextEl = document.getElementById('motivation-subtext');
+
+            if (structuralCheckmarkCount === 0) {
+                emojiEl.innerText = "🌱";
+                textEl.innerText = `Welcome ${appState.username}. A disciplined system begins with a single checkmark.`;
+                subtextEl.innerText = '"Every action you take is a vote for the identity you are becoming."';
+                banner.className = appState.isDarkMode ? "p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 text-zinc-300" : "p-4 rounded-xl border border-stone-300 bg-white text-stone-700";
+            } else if (missedTwiceDetected) {
+                emojiEl.innerText = "🛡️";
+                textEl.innerText = `System Notice Vector: ${appState.username}, break the sliding inertia sequence immediately.`;
+                subtextEl.innerText = '"Missing once is an accident. Missing twice is the start of a new bad habit."';
+                banner.className = appState.isDarkMode ? "p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400" : "p-4 rounded-xl border border-rose-300 bg-rose-50/50 text-rose-900";
+            } else if (trackingRatio >= 0.40) {
+                emojiEl.innerText = "⚡";
+                textEl.innerText = `Exceptional momentum validation velocity, ${appState.username}! Your identity waveform is highly integrated.`;
+                subtextEl.innerText = '"You do not rise to the level of your goals. You fall to the level of your systems."';
+                banner.className = appState.isDarkMode ? "p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-400" : "p-4 rounded-xl border border-emerald-600/30 bg-emerald-50/60 text-emerald-900";
+            } else {
+                emojiEl.innerText = "🔥";
+                textEl.innerText = `System operational engine functional. Protect the baseline constraints, ${appState.username}.`;
+                subtextEl.innerText = "Focus on tracking friction containment.";
+                banner.className = appState.isDarkMode ? "p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-400" : "p-4 rounded-xl border border-amber-600/30 bg-emerald-50/60 text-amber-900";
+            }
+        }
+
+        // 7. TIME CONFIGURATION MANAGEMENT
+        function setTemporalMode(mode) {
+            appState.temporalMode = mode;
+            document.getElementById('temporal-badge').innerText = mode === 'realtime' ? 'Real-Time Sync' : 'Custom Block';
+            
+            const rtBtn = document.getElementById('time-rt-btn');
+            const customBtn = document.getElementById('time-custom-btn');
+            const selectorsPanel = document.getElementById('custom-time-selectors');
+
+            if (mode === 'realtime') {
+                rtBtn.className = "px-3 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition bg-emerald-500 text-black shadow-md cursor-pointer";
+                customBtn.className = "px-3 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition text-zinc-400 cursor-pointer";
+                selectorsPanel.classList.add('hidden');
+            } else {
+                customBtn.className = "px-3 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition bg-emerald-500 text-black shadow-md cursor-pointer";
+                rtBtn.className = "px-3 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition text-zinc-400 cursor-pointer";
+                selectorsPanel.classList.remove('hidden');
+            }
+            saveSystemState();
+            executeUIRenderLifecycle();
+        }
+
+        function populateCustomSelectorMenus() {
+            const monthsNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const monthMenu = document.getElementById('select-month');
+            const yearMenu = document.getElementById('select-year');
+            const customDaysInput = document.getElementById('input-custom-days');
+
+            monthMenu.innerHTML = '';
+            yearMenu.innerHTML = '';
+
+            monthsNames.forEach((m, idx) => {
+                monthMenu.innerHTML += `<option value="${idx}" ${appState.customMonth === idx ? 'selected' : ''}>${m}</option>`;
+            });
+
+            const currentPhysicalYear = new Date().getFullYear();
+            for (let y = currentPhysicalYear - 2; y <= currentPhysicalYear + 5; y++) {
+                yearMenu.innerHTML += `<option value="${y}" ${appState.customYear === y ? 'selected' : ''}>${y}</option>`;
+            }
+
+            customDaysInput.value = appState.customDaysCount || 30;
+        }
+
+        function changeCustomDate() {
+            appState.customMonth = parseInt(document.getElementById('select-month').value);
+            appState.customYear = parseInt(document.getElementById('select-year').value);
+            saveSystemState();
+            executeUIRenderLifecycle();
+        }
+
+        function changeCustomDaysCount() {
+            const val = parseInt(document.getElementById('input-custom-days').value);
+            if (val && val > 0) {
+                appState.customDaysCount = val;
+                saveSystemState();
+                executeUIRenderLifecycle();
+            }
+        }
+
+        // NAVIGATION SWITCHER
+        function switchViewTab(targetTab) {
+            appState.activeTab = targetTab;
+            const matrixBtn = document.getElementById('tab-matrix-btn');
+            const pastBtn = document.getElementById('tab-past-btn');
+            
+            const matrixZone = document.getElementById('view-zone-matrix');
+            const pastZone = document.getElementById('view-zone-past');
+
+            if(targetTab === 'matrix') {
+                matrixBtn.className = "px-4 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition bg-emerald-500 text-black shadow-md cursor-pointer";
+                pastBtn.className = "px-4 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition text-zinc-400 cursor-pointer";
+                matrixZone.classList.remove('hidden');
+                pastZone.classList.add('hidden');
+            } else {
+                pastBtn.className = "px-4 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition bg-emerald-500 text-black shadow-md cursor-pointer";
+                matrixBtn.className = "px-4 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg premium-transition text-zinc-400 cursor-pointer";
+                matrixZone.classList.add('hidden');
+                pastZone.classList.remove('hidden');
+                renderPastArchives();
+            }
+            saveSystemState();
+        }
+
+        // HISTORICAL ARCHIVE ENGINE
+        function promptArchiveMonth() {
+            const currentContextDate = getActiveContextDate();
+            if(appState.temporalMode === 'custom') {
+                document.getElementById('prompt-archive-title').innerText = `Custom Block (${appState.customDaysCount} Days)`;
+            } else {
+                const optionsMap = { month: 'long', year: 'numeric' };
+                document.getElementById('prompt-archive-title').innerText = currentContextDate.toLocaleDateString('en-US', optionsMap);
+            }
+            document.getElementById('archive-prompt-modal').classList.remove('hidden');
+        }
+
+        function closeArchivePrompt() {
+            document.getElementById('archive-prompt-modal').classList.add('hidden');
+        }
+
+        function commitArchiveSnapshot() {
+            let titleText = '';
+            if(appState.temporalMode === 'custom') {
+                titleText = `Custom Target Horizon (${appState.customDaysCount}d) - ${new Date().toLocaleDateString()}`;
+            } else {
+                const currentContextDate = getActiveContextDate();
+                const optionsMap = { month: 'long', year: 'numeric' };
+                titleText = currentContextDate.toLocaleDateString('en-US', optionsMap);
+            }
+            
+            let records = [];
+            appState.habits.forEach(h => {
+                let monthlyHits = 0;
+                const daysCount = getDaysInCurrentContext();
+                for(let d=1; d<=daysCount; d++) {
+                    if(h.history[generateDateContextKey(d)]) {
+                        monthlyHits++;
+                    }
+                }
+                records.push({ name: h.name, monthlyHits: monthlyHits, globalGoal: h.goal });
+            });
+
+            appState.archives = appState.archives.filter(a => a.period !== titleText);
+            
+            appState.archives.push({
+                id: 'arch_' + Date.now(),
+                period: titleText,
+                timestamp: new Date().toLocaleDateString(),
+                records: records
+            });
+
+            saveSystemState();
+            closeArchivePrompt();
+            switchViewTab('past');
+        }
+
+        function deleteArchiveCard(archId) {
+            appState.archives = appState.archives.filter(a => a.id !== archId);
+            saveSystemState();
+            renderPastArchives();
+        }
+
+        function renderPastArchives() {
+            const emptyState = document.getElementById('past-archives-empty-state');
+            const container = document.getElementById('past-archives-container');
+            
+            container.innerHTML = '';
+            
+            if(appState.archives.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            appState.archives.forEach(arch => {
+                let listMarkup = '';
+                arch.records.forEach(r => {
+                    listMarkup += `
+                        <div class="flex justify-between items-center text-xs py-1 border-b border-zinc-800/40">
+                            <span class="text-zinc-400 font-medium truncate max-w-[160px]">${r.name}</span>
+                            <span class="font-mono font-bold text-emerald-400">${r.monthlyHits} <span class="text-zinc-600 text-[10px]">/ ${r.globalGoal}d</span></span>
+                        </div>
+                    `;
+                });
+
+                const cardMarkup = `
+                    <div class="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-3 relative group dashboard-card transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-xs text-white uppercase font-mono truncate max-w-[180px]">${arch.period}</h4>
+                                <span class="text-[9px] text-zinc-500 font-mono block">Archived: ${arch.timestamp}</span>
+                            </div>
+                            <button onclick="deleteArchiveCard('${arch.id}')" class="text-[10px] font-mono text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 px-2 py-0.5 rounded-lg cursor-pointer">Delete</button>
+                        </div>
+                        <div class="space-y-1.5 pt-2 border-t border-zinc-800">
+                            ${listMarkup}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardMarkup;
+            });
+            applyThemeStyles();
+        }
+
+        // 8. GRAPHICS DATA PROCESSING ENGINES
+        function operationalizeGraphicsEngines(daysInMonth, dailyCompletions, habitLabels, habitCompletions) {
+            const themeAccent = appState.isDarkMode ? '#10b981' : '#87987d';
+            const themeMuted = appState.isDarkMode ? '#27272a' : '#e5e5e0';
+            const fontColor = appState.isDarkMode ? '#a1a1aa' : '#444444';
+
+            const lineLabels = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`);
+            
+            let totalLifetimeActiveGoalCapacity = appState.habits.reduce((acc, h) => acc + h.goal, 0);
+            let absoluteTotalLifetimeCheckedHits = 0;
+            
+            appState.habits.forEach(h => {
+                absoluteTotalLifetimeCheckedHits += Object.values(h.history).filter(v => v === true).length;
+            });
+
+            const operationalRate = totalLifetimeActiveGoalCapacity > 0 ? Math.min(100, Math.round((absoluteTotalLifetimeCheckedHits / totalLifetimeActiveGoalCapacity) * 100)) : 0;
+
+            if (chartsInstance.waveform) chartsInstance.waveform.destroy();
+            const ctxWave = document.getElementById('waveformChart').getContext('2d');
+            chartsInstance.waveform = new Chart(ctxWave, {
+                type: 'line',
+                data: {
+                    labels: lineLabels,
+                    datasets: [{
+                        label: 'Hits Vector',
+                        data: dailyCompletions,
+                        borderColor: themeAccent,
+                        backgroundColor: appState.isDarkMode ? 'rgba(16, 185, 129, 0.05)' : 'rgba(135, 152, 125, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: fontColor, font: { size: 9, family: 'monospace' } } },
+                        y: { min: 0, max: Math.max(appState.habits.length, 1), ticks: { stepSize: 1, color: fontColor, font: { size: 9, family: 'monospace' } }, grid: { color: themeMuted } }
+                    }
+                }
+            });
+
+            if (chartsInstance.circular) chartsInstance.circular.destroy();
+            const ctxCirc = document.getElementById('circularChart').getContext('2d');
+            chartsInstance.circular = new Chart(ctxCirc, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hit Volume', 'Pending Horizon Target Allocation'],
+                    datasets: [{
+                        data: [absoluteTotalLifetimeCheckedHits, Math.max(0, totalLifetimeActiveGoalCapacity - absoluteTotalLifetimeCheckedHits)],
+                        backgroundColor: [themeAccent, themeMuted],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } }
+                }
+            });
+
+            const circContainer = document.getElementById('circularChart').parentElement;
+            let overlay = document.getElementById('chart-center-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'chart-center-overlay';
+                overlay.className = 'absolute inset-0 flex flex-col items-center justify-center pointer-events-none font-mono text-center';
+                circContainer.appendChild(overlay);
+            }
+            overlay.innerHTML = `<span class="text-2xl font-black ${appState.isDarkMode ? 'text-white' : 'text-stone-800'}">${operationalRate}%</span><span class="text-[9px] text-zinc-500 uppercase tracking-wider font-bold">Total Velocity</span>`;
+
+            if (chartsInstance.poll) chartsInstance.poll.destroy();
+            const ctxPoll = document.getElementById('pollChart').getContext('2d');
+            chartsInstance.poll = new Chart(ctxPoll, {
+                type: 'bar',
+                data: {
+                    labels: habitLabels.map(l => l.length > 10 ? l.substring(0,10)+'...' : l),
+                    datasets: [{ data: habitCompletions, backgroundColor: themeAccent, borderRadius: 4 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: fontColor, font: { size: 8, family: 'monospace' } } },
+                        y: { ticks: { color: fontColor, font: { size: 8, family: 'monospace' } }, grid: { color: themeMuted } }
+                    }
+                }
+            });
+        }
+
+        function calculateHabitGoalEndDate(startDateStr, goalDays) {
+            if(!startDateStr) return "N/A";
+            let start = new Date(startDateStr);
+            if(isNaN(start.getTime())) return "N/A";
+            start.setDate(start.getDate() + parseInt(goalDays));
+            return start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        // 9. CORE MATRIX HEADERS COMPILATION
+        function compileMatrixShellHeaders(currentContextDate, daysInMonth, globalBorders) {
+            const weekHeader = document.getElementById('week-header-row');
+            const dayNamesHeader = document.getElementById('day-names-row');
+            const dayNumsHeader = document.getElementById('day-numbers-row');
+
+            if (appState.temporalMode === 'custom') {
+                weekHeader.style.display = 'none';
+                dayNamesHeader.style.display = 'none';
+                
+                dayNumsHeader.innerHTML = `<div class="py-2 px-3 text-left border-r ${globalBorders}">Identity Core Dimensions</div><div class="py-2 border-r ${globalBorders}">Total</div>`;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    dayNumsHeader.innerHTML += `<div class="py-2 font-bold border-r ${globalBorders} text-[10px]">Day ${d}</div>`;
+                }
+                dayNumsHeader.innerHTML += `<div class="py-2">Global Target Wave</div>`;
+                return;
+            }
+
+            weekHeader.style.display = 'grid';
+            dayNamesHeader.style.display = 'grid';
+
+            weekHeader.innerHTML = `<div class="py-2 px-3 text-left border-r ${globalBorders}">Temporal Framework</div><div class="py-2 border-r ${globalBorders}">Goal</div>`;
+            dayNamesHeader.innerHTML = `<div class="py-1 px-3 text-left border-r ${globalBorders}">System Metrics</div><div class="py-1 border-r ${globalBorders}">-</div>`;
+            dayNumsHeader.innerHTML = `<div class="py-1 px-3 text-left border-r ${globalBorders}">Identity Core Dimensions</div><div class="py-1 border-r ${globalBorders}">Total</div>`;
+
+            let functionalDayCounter = 1;
+            let partitionIndex = 1;
+
+            while (functionalDayCounter <= daysInMonth) {
+                let currentBlockSpanSize = 0;
+                let identificationLabel = `W${partitionIndex}`;
+
+                if (functionalDayCounter <= 7) currentBlockSpanSize = Math.min(7 - functionalDayCounter + 1, daysInMonth - functionalDayCounter + 1);
+                else if (functionalDayCounter <= 14) currentBlockSpanSize = Math.min(14 - functionalDayCounter + 1, daysInMonth - functionalDayCounter + 1);
+                else if (functionalDayCounter <= 21) currentBlockSpanSize = Math.min(21 - functionalDayCounter + 1, daysInMonth - functionalDayCounter + 1);
+                else if (functionalDayCounter <= 28) currentBlockSpanSize = Math.min(28 - functionalDayCounter + 1, daysInMonth - functionalDayCounter + 1);
+                else {
+                    currentBlockSpanSize = daysInMonth - functionalDayCounter + 1;
+                    identificationLabel = "Extra";
+                }
+
+                const accentColorStyle = partitionIndex % 2 === 0 ? 'bg-amber-500/5' : 'bg-emerald-500/5';
+                weekHeader.innerHTML += `<div class="col-span-${currentBlockSpanSize} ${accentColorStyle} border-r ${globalBorders} py-2">${identificationLabel}</div>`;
+                
+                functionalDayCounter += currentBlockSpanSize;
+                partitionIndex++;
+            }
+            weekHeader.innerHTML += `<div class="py-2">System Progression Map</div>`;
+
+            const baselineDaysArray = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            for (let d = 1; d <= daysInMonth; d++) {
+                const calculatedDateObj = new Date(currentContextDate.getFullYear(), currentContextDate.getMonth(), d);
+                const dayNameString = baselineDaysArray[calculatedDateObj.getDay()];
+
+                dayNamesHeader.innerHTML += `<div class="py-1 border-r ${globalBorders}">${dayNameString}</div>`;
+                dayNumsHeader.innerHTML += `<div class="py-1 font-bold border-r ${globalBorders}">${d}</div>`;
+            }
+
+            dayNamesHeader.innerHTML += `<div class="py-1">Metrics</div>`;
+            dayNumsHeader.innerHTML += `<div class="py-1">Global Target Wave</div>`;
+        }
+
+        function compileMatrixFooterMetrics(daysInMonth, dynamicDailyCompletionsArray, globalBorders, contextTextMuted) {
+            const completedRow = document.getElementById('daily-completed-totals-row');
+            const goalsRow = document.getElementById('daily-goals-totals-row');
+            const leftRow = document.getElementById('daily-left-totals-row');
+
+            completedRow.innerHTML = `<div class="py-2 px-3 text-left border-r ${globalBorders} ${contextTextMuted}">Month Completed Hits</div><div class="py-2 border-r ${globalBorders}">-</div>`;
+            goalsRow.innerHTML = `<div class="py-1 px-3 text-left border-r ${globalBorders} ${contextTextMuted}">Baseline Active Vectors</div><div class="py-1 border-r ${globalBorders}">-</div>`;
+            leftRow.innerHTML = `<div class="py-1 px-3 text-left border-r ${globalBorders} ${contextTextMuted}">Month Deficit Remainder</div><div class="py-1 border-r ${globalBorders}">-</div>`;
+
+            const totalHabitsRegisterSize = appState.habits.length;
+
+            for (let index = 0; index < daysInMonth; index++) {
+                const dailyHitCount = dynamicDailyCompletionsArray[index];
+                const deficitRemainder = Math.max(0, totalHabitsRegisterSize - dailyHitCount);
+
+                completedRow.innerHTML += `<div class="py-2 border-r ${globalBorders} text-emerald-500 font-bold">${dailyHitCount}</div>`;
+                goalsRow.innerHTML += `<div class="py-1 border-r ${globalBorders}">${totalHabitsRegisterSize}</div>`;
+                leftRow.innerHTML += `<div class="py-1 border-r ${globalBorders} ${deficitRemainder > 0 ? 'text-amber-500/80' : 'text-zinc-600'}">${deficitRemainder}</div>`;
+            }
+
+            completedRow.innerHTML += `<div class="py-2 ${contextTextMuted}">Summary</div>`;
+            goalsRow.innerHTML += `<div class="py-1 ${contextTextMuted}">Summary</div>`;
+            leftRow.innerHTML += `<div class="py-1 ${contextTextMuted}">Summary</div>`;
+        }
+
+        // 10. LIFECYCLE CONTROLLER WITH REAL-TIME COLUMN DEACTIVATION
+        function executeUIRenderLifecycle() {
+            const currentContextDate = getActiveContextDate();
+            const daysInMonth = getDaysInCurrentContext();
+            
+            document.documentElement.style.setProperty('--days-in-month', daysInMonth);
+
+            if(appState.temporalMode === 'custom') {
+                document.getElementById('app-month-display').innerText = `Custom Block Horizon`;
+            } else {
+                const optionsMap = { month: 'long', year: 'numeric' };
+                document.getElementById('app-month-display').innerText = currentContextDate.toLocaleDateString('en-US', optionsMap);
+            }
+            
+            document.getElementById('user-greeting').innerText = `Architect: ${appState.username}`;
+
+            const globalBorders = appState.isDarkMode ? 'border-zinc-900/40' : 'border-stone-200';
+            const contextTextMuted = appState.isDarkMode ? 'text-zinc-500' : 'text-stone-400';
+
+            compileMatrixShellHeaders(currentContextDate, daysInMonth, globalBorders);
+
+            let dynamicDailyCompletionsArray = Array(daysInMonth).fill(0);
+            let totalAggregateGlobalLifetimeCompleted = 0;
+            let totalTargetGoalsCompilations = 0;
+
+            let habitLabels = [];
+            let habitCompletions = [];
+
+            const injectionBodyZone = document.getElementById('matrix-rows-injection-target');
+            injectionBodyZone.innerHTML = '';
+
+            const todayObj = new Date();
+            const isCurrentMonthYear = (currentContextDate.getMonth() === todayObj.getMonth()) && (currentContextDate.getFullYear() === todayObj.getFullYear());
+
+            appState.habits.forEach(habit => {
+                habitLabels.push(habit.name);
+                
+                for (let d = 1; d <= daysInMonth; d++) {
+                    if (habit.history[generateDateContextKey(d)]) {
+                        dynamicDailyCompletionsArray[d - 1]++;
+                    }
+                }
+                
+                let totalLifetimeCheckedCount = Object.values(habit.history).filter(v => v === true).length;
+                
+                habitCompletions.push(totalLifetimeCheckedCount);
+                totalAggregateGlobalLifetimeCompleted += totalLifetimeCheckedCount;
+                totalTargetGoalsCompilations += habit.goal;
+
+                const allocationPercentage = Math.round((totalLifetimeCheckedCount / habit.goal) * 100) || 0;
+                const computedEndDateString = calculateHabitGoalEndDate(habit.startDate, habit.goal);
+
+                let habitRowMarkup = `
+                    <div class="matrix-grid-layout text-center text-xs font-medium items-center hover:bg-zinc-500/5 group">
+                        <div class="py-2 px-3 text-left border-r ${globalBorders} font-semibold truncate tracking-tight flex flex-col justify-center min-h-[52px]">
+                            <span class="truncate pr-1 block cursor-pointer hover:text-emerald-500 transition-colors text-white font-bold" onclick="openHabitModal('${habit.id}')">${habit.name}</span>
+                            <span class="text-[9px] text-zinc-500 font-mono block mt-0.5 uppercase tracking-tight">Ends: ${computedEndDateString}</span>
+                        </div>
+                        <div class="py-3 font-mono font-bold border-r ${globalBorders} opacity-40 text-center">${habit.goal}</div>
+                `;
+
+                for (let dayIndex = 1; dayIndex <= daysInMonth; dayIndex++) {
+                    const trackingKey = generateDateContextKey(dayIndex);
+                    const isChecked = !!habit.history[trackingKey];
+
+                    let cellBackground = 'bg-transparent';
+                    let isDisabled = false;
+
+                    if (appState.temporalMode === 'realtime') {
+                        const currentPhysicalDay = todayObj.getDate();
+                        if (isCurrentMonthYear) {
+                            if (dayIndex === currentPhysicalDay) {
+                                cellBackground = appState.isDarkMode ? 'bg-zinc-800/60' : 'bg-stone-200/80';
+                            } else {
+                                isDisabled = true; 
+                            }
+                        } else {
+                            isDisabled = true; 
+                        }
+                    }
+
+                    let checkboxUI = '';
+                    if (isChecked) {
+                        checkboxUI = appState.isDarkMode 
+                            ? 'bg-emerald-500 border-emerald-600 text-black font-bold scale-[1.05] shadow-sm shadow-emerald-500/10' 
+                            : 'bg-[#a3b19b] border-[#87987d] text-white font-bold scale-[1.05]';
+                    } else {
+                        checkboxUI = appState.isDarkMode 
+                            ? 'border-zinc-800 bg-zinc-950/40 hover:border-zinc-600 text-transparent' 
+                            : 'border-stone-300 bg-stone-50 hover:border-stone-400 text-transparent';
+                    }
+
+                    if (isDisabled) {
+                        checkboxUI += ' opacity-15 cursor-not-allowed pointer-events-none bg-zinc-900/50';
+                    }
+
+                    habitRowMarkup += `
+                        <div class="py-2 flex items-center justify-center border-r ${globalBorders} ${cellBackground}">
+                            <button ${isDisabled ? 'disabled' : ''} onclick="toggleExecutionCoordinate('${habit.id}', ${dayIndex})" class="w-6 h-6 rounded border flex items-center justify-center text-[10px] premium-transition active:scale-75 cursor-pointer ${checkboxUI}">
+                                ✓
+                            </button>
+                        </div>
+                    `;
+                }
+
+                const fillingBarWidth = Math.min(allocationPercentage, 100);
+                const barColor = allocationPercentage >= 100 ? 'bg-emerald-500' : appState.isDarkMode ? 'bg-zinc-700' : 'bg-stone-400';
+
+                habitRowMarkup += `
+                    <div class="py-2 px-3 font-mono flex items-center gap-2 justify-end text-right text-[11px]">
+                        <span class="font-bold min-w-[55px] text-zinc-400 text-right">${totalLifetimeCheckedCount}/${habit.goal}d</span>
+                        <div class="w-14 bg-zinc-800/40 light-mode:bg-stone-200 h-2 rounded-full overflow-hidden relative border border-zinc-900/10 hidden sm:block">
+                            <div class="h-full ${barColor} premium-transition" style="width: ${fillingBarWidth}%"></div>
+                        </div>
+                        <span class="font-bold text-[10px] text-emerald-500 w-8">${allocationPercentage}%</span>
+                    </div>
+                </div>`;
+                
+                injectionBodyZone.innerHTML += habitRowMarkup;
+            });
+
+            compileMatrixFooterMetrics(daysInMonth, dynamicDailyCompletionsArray, globalBorders, contextTextMuted);
+
+            document.getElementById('stat-completed').innerText = totalAggregateGlobalLifetimeCompleted;
+            document.getElementById('stat-left').innerText = Math.max(0, totalTargetGoalsCompilations - totalAggregateGlobalLifetimeCompleted);
+
+            operationalizeGraphicsEngines(daysInMonth, dynamicDailyCompletionsArray, habitLabels, habitCompletions);
+            evaluateIdentityMotivations();
+        }
+
+        function toggleExecutionCoordinate(habitId, dayIndex) {
+            const targetHabit = appState.habits.find(h => h.id === habitId);
+            if (targetHabit) {
+                const storageKey = generateDateContextKey(dayIndex);
+                targetHabit.history[storageKey] = !targetHabit.history[storageKey];
+                saveSystemState();
+                executeUIRenderLifecycle();
+            }
+        }
+
+        // 11. MODAL DIALOGS AND DATA STRUCTURE CRUD
+        function openHabitModal(habitId = null) {
+            const modal = document.getElementById('habit-modal');
+            const title = document.getElementById('habit-modal-title');
+            const deleteBtn = document.getElementById('modal-delete-btn');
+            
+            document.getElementById('habit-name-field').value = '';
+            document.getElementById('habit-goal-field').value = '20';
+            document.getElementById('habit-start-field').value = new Date().toISOString().split('T')[0];
+            document.getElementById('edit-habit-id').value = '';
+
+            if (habitId) {
+                const targetHabit = appState.habits.find(h => h.id === habitId);
+                if (targetHabit) {
+                    title.innerText = "Modify Identity Pillar Constraints";
+                    document.getElementById('habit-name-field').value = targetHabit.name;
+                    document.getElementById('habit-goal-field').value = targetHabit.goal;
+                    document.getElementById('habit-start-field').value = targetHabit.startDate || new Date().toISOString().split('T')[0];
+                    document.getElementById('edit-habit-id').value = habitId;
+                    deleteBtn.classList.remove('hidden');
+                }
+            } else {
+                title.innerText = "Add New Identity Pillar";
+                deleteBtn.classList.add('hidden');
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeHabitModal() {
+            document.getElementById('habit-modal').classList.add('hidden');
+        }
+
+        function commitHabitChanges() {
+            const name = document.getElementById('habit-name-field').value.trim();
+            const goal = parseInt(document.getElementById('habit-goal-field').value) || 20;
+            const startDate = document.getElementById('habit-start-field').value || new Date().toISOString().split('T')[0];
+            const editId = document.getElementById('edit-habit-id').value;
+
+            if (!name) return;
+
+            if (editId) {
+                const index = appState.habits.findIndex(h => h.id === editId);
+                if (index !== -1) {
+                    appState.habits[index].name = name;
+                    appState.habits[index].goal = Math.max(1, goal);
+                    appState.habits[index].startDate = startDate;
+                }
+            } else {
+                const uniqueId = 'habit_' + Date.now();
+                appState.habits.push({
+                    id: uniqueId,
+                    name: name,
+                    goal: Math.max(1, goal),
+                    startDate: startDate,
+                    history: {}
+                });
+            }
+
+            saveSystemState();
+            closeHabitModal();
+            executeUIRenderLifecycle();
+        }
+
+        // DESTRUCTION FUNCTION VECTOR
+        window.deleteArchiveCard = function(archId) {
+            appState.archives = appState.archives.filter(a => a.id !== archId);
+            saveSystemState();
+            renderPastArchives();
+        }
+
+        function deleteHabitAction() {
+            const editId = document.getElementById('edit-habit-id').value;
+            if (editId) {
+                appState.habits = appState.habits.filter(h => h.id !== editId);
+                saveSystemState();
+                closeHabitModal();
+                executeUIRenderLifecycle();
+            }
+        }
+
+        // ENTRY POINT SYSTEM BOOT RUNTIME
+        function bootApexEngineSystem() {
+            loadSystemState();
+            populateCustomSelectorMenus();
+            switchViewTab(appState.activeTab || 'matrix');
+            executeUIRenderLifecycle();
+        }
+
+        window.onload = bootApexEngineSystem;
+    </script>
+
+    <!-- Install PWA prompt -->
+    <div id="install-prompt" class="items-center gap-3 p-3 pr-4 rounded-2xl border border-emerald-500/30 bg-zinc-950/95 backdrop-blur-xl shadow-2xl shadow-emerald-500/10 apex-pulse">
+        <img src="/apex-titan-logo.png" alt="" class="w-10 h-10 rounded-lg border border-zinc-800">
+        <div class="text-left">
+            <div class="text-xs font-mono font-bold uppercase tracking-widest text-emerald-400">Install Apex Titan</div>
+            <div class="text-[11px] text-zinc-400">Add to home screen for offline access</div>
+        </div>
+        <button id="install-btn" class="ml-2 px-3 py-1.5 text-[10px] font-mono font-bold uppercase bg-emerald-500 text-black rounded-lg hover:bg-emerald-400 cursor-pointer">Install</button>
+        <button id="install-dismiss" aria-label="Dismiss install prompt" class="text-zinc-500 hover:text-zinc-300 text-lg leading-none px-1 cursor-pointer">×</button>
+    </div>
+
+    <script>
+        // ====== PWA: install prompt + service worker registration with Lovable preview guards ======
+        (function () {
+            const host = location.hostname;
+            const inIframe = window.self !== window.top;
+            const isPreview =
+                host.startsWith('id-preview--') ||
+                host.startsWith('preview--') ||
+                host === 'lovableproject.com' || host.endsWith('.lovableproject.com') ||
+                host === 'lovableproject-dev.com' || host.endsWith('.lovableproject-dev.com') ||
+                host === 'beta.lovable.dev' || host.endsWith('.beta.lovable.dev');
+            const swDisabled = new URLSearchParams(location.search).get('sw') === 'off';
+
+            if ('serviceWorker' in navigator) {
+                if (isPreview || inIframe || swDisabled || location.protocol === 'http:' && host !== 'localhost') {
+                    // Refuse and clean up any prior registrations matching /sw.js
+                    navigator.serviceWorker.getRegistrations().then(regs => {
+                        regs.forEach(r => { if (r.active && r.active.scriptURL.endsWith('/sw.js')) r.unregister(); });
+                    }).catch(() => {});
+                } else {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('/sw.js').catch(() => {});
+                    });
+                }
+            }
+
+            // Install prompt
+            let deferred = null;
+            const promptEl = document.getElementById('install-prompt');
+            const btn = document.getElementById('install-btn');
+            const dismiss = document.getElementById('install-dismiss');
+            const KEY = 'apex_install_dismissed_v1';
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferred = e;
+                if (!localStorage.getItem(KEY) && !isPreview) {
+                    setTimeout(() => promptEl.classList.add('visible'), 4000);
+                }
+            });
+            btn?.addEventListener('click', async () => {
+                if (!deferred) return;
+                deferred.prompt();
+                await deferred.userChoice.catch(() => {});
+                deferred = null;
+                promptEl.classList.remove('visible');
+            });
+            dismiss?.addEventListener('click', () => {
+                localStorage.setItem(KEY, '1');
+                promptEl.classList.remove('visible');
+            });
+            window.addEventListener('appinstalled', () => promptEl.classList.remove('visible'));
+        })();
+    </script>
+</body>
+</html>
